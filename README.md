@@ -1,3 +1,7 @@
+**About PyTorch 1.0.0**
+  * We support PyTorch 1.0.0. If you prefer the previous versions of PyTorch, use legacy branches.
+  * ``--ext bin`` is not supported. Also, please erase your bin files with ``--ext sep-reset``. Once you successfully build those bin files, you can remove ``-reset`` from the argument.
+
 # EDSR-PyTorch
 ![](/figs/main.png)
 
@@ -25,18 +29,15 @@ We provide scripts for reproducing all the results from our paper. You can train
 * Training and evaluation requires less memory.
 * Python-based.
 
-**Recent updates**
-* Apr 9, 2018
-  * VGG and Adversarial loss is implemented based on [SRGAN](http://openaccess.thecvf.com/content_cvpr_2017/papers/Ledig_Photo-Realistic_Single_Image_CVPR_2017_paper.pdf). [WGAN](https://arxiv.org/abs/1701.07875) and [gradient penalty](https://arxiv.org/abs/1704.00028) are also implemented, but they are not tested yet.
-  * Many codes are refactored. If there exists a bug, please report it.
-  * [D-DBPN](https://arxiv.org/abs/1803.02735) is implemented. Default setting is D-DBPN-L.
 ## Dependencies
-* Python (Tested with 3.6)
-* PyTorch >= 0.3.1
+* Python 3.6
+* PyTorch >= 1.0.0
 * numpy
-* scipy
+* skimage
+* **imageio**
 * matplotlib
 * tqdm
+* cv2 >= 3.xx (Only if you want to use video input/output)
 
 ## Code
 Clone this repository into any place you want.
@@ -48,9 +49,9 @@ cd EDSR-PyTorch
 ## Quick start (Demo)
 You can test our super-resolution algorithm with your own images. Place your images in ``test`` folder. (like ``test/<your_image>``) We support **png** and **jpeg** files.
 
-Run the script in ``code`` folder. Before you run the demo, please uncomment the appropriate line in ```demo.sh``` that you want to execute.
+Run the script in ``src`` folder. Before you run the demo, please uncomment the appropriate line in ```demo.sh``` that you want to execute.
 ```bash
-cd code       # You are now in */EDSR-PyTorch/code
+cd src       # You are now in */EDSR-PyTorch/src
 sh demo.sh
 ```
 
@@ -86,19 +87,23 @@ You can evaluate your models with widely-used benchmark datasets:
 
 For these datasets, we first convert the result images to YCbCr color space and evaluate PSNR on the Y channel only. You can download [benchmark datasets](https://cv.snu.ac.kr/research/EDSR/benchmark.tar) (250MB). Set ``--dir_data <where_benchmark_folder_located>`` to evaluate the EDSR and MDSR with the benchmarks.
 
+You can download some results from [here](https://cv.snu.ac.kr/research/EDSR/result_image/edsr-results.tar).
+The link contains **EDSR+_baseline_x4** and **EDSR+_x4**.
+Otherwise, you can easily generate result images with ``demo.sh`` scripts.
+
 ## How to train EDSR and MDSR
 We used [DIV2K](http://www.vision.ee.ethz.ch/%7Etimofter/publications/Agustsson-CVPRW-2017.pdf) dataset to train our model. Please download it from [here](https://cv.snu.ac.kr/research/EDSR/DIV2K.tar) (7.1GB).
 
-Unpack the tar file to any place you want. Then, change the ```dir_data``` argument in ```code/option.py``` to the place where DIV2K images are located.
+Unpack the tar file to any place you want. Then, change the ```dir_data``` argument in ```src/option.py``` to the place where DIV2K images are located.
 
 We recommend you to pre-process the images before training. This step will decode all **png** files and save them as binaries. Use ``--ext sep_reset`` argument on your first run. You can skip the decoding part and use saved binaries with ``--ext sep`` argument.
 
 If you have enough RAM (>= 32GB), you can use ``--ext bin`` argument to pack all DIV2K images in one binary file.
 
-You can train EDSR and MDSR by yourself. All scripts are provided in the ``code/demo.sh``. Note that EDSR (x3, x4) requires pre-trained EDSR (x2). You can ignore this constraint by removing ```--pre_train <x2 model>``` argument.
+You can train EDSR and MDSR by yourself. All scripts are provided in the ``src/demo.sh``. Note that EDSR (x3, x4) requires pre-trained EDSR (x2). You can ignore this constraint by removing ```--pre_train <x2 model>``` argument.
 
 ```bash
-cd code       # You are now in */EDSR-PyTorch/code
+cd src       # You are now in */EDSR-PyTorch/src
 sh demo.sh
 ```
 
@@ -109,7 +114,7 @@ sh demo.sh
   * Training details are included.
 
 * Jan 09, 2018
-  * Missing files are included (```code/data/MyImage.py```).
+  * Missing files are included (```src/data/MyImage.py```).
   * Some links are fixed.
 
 * Jan 16, 2018
@@ -125,8 +130,7 @@ sh demo.sh
 
 * Feb 23, 2018
   * Now PyTorch 0.3.1 is default. Use legacy/0.3.0 branch if you use the old version.
-   
-  * With a new ``code/data/DIV2K.py`` code, one can easily create new data class for super-resolution.
+  * With a new ``src/data/DIV2K.py`` code, one can easily create new data class for super-resolution.
   * New binary data pack. (Please remove the ``DIV2K_decoded`` folder from your dataset if you have.)
   * With ``--ext bin``, this code will automatically generates and saves the binary data pack that corresponds to previous ``DIV2K_decoded``. (This requires huge RAM (~45GB, Swap can be used.), so please be careful.)
   * If you cannot make the binary pack, just use the default setting (``--ext img``).
@@ -154,3 +158,22 @@ sh demo.sh
   * We also provide ``MDSR_baseline_jpeg`` model that suppresses JPEG artifacts in original low-resolution image. Please use it if you have any trouble.
   * ``MyImage`` dataset is changed to ``Demo`` dataset. Also, it works more efficient than before.
   * Some codes and script are re-written.
+
+* Apr 9, 2018
+  * VGG and Adversarial loss is implemented based on [SRGAN](http://openaccess.thecvf.com/content_cvpr_2017/papers/Ledig_Photo-Realistic_Single_Image_CVPR_2017_paper.pdf). [WGAN](https://arxiv.org/abs/1701.07875) and [gradient penalty](https://arxiv.org/abs/1704.00028) are also implemented, but they are not tested yet.
+  * Many codes are refactored. If there exists a bug, please report it.
+  * [D-DBPN](https://arxiv.org/abs/1803.02735) is implemented. Default setting is D-DBPN-L.
+
+* Apr 26, 2018
+  * Compatible with PyTorch 0.4.0
+  * Please use the legacy/0.3.1 branch if you are using the old version of PyTorch.
+  * Minor bug fixes
+
+* July 22, 2018
+  * Thanks for recent commits that contains RDN and RCAN. Please see ``code/demo.sh`` to train/test those models.
+  * Now the dataloader is much stable than the previous version. Please erase ``DIV2K/bin`` folder that is created before this commit. Also, please avoid to use ``--ext bin`` argument. Our code will automatically pre-decode png images before training. If you do not have enough spaces(~10GB) in your disk, we recommend ``--ext img``(But SLOW!).
+
+* Oct 18, 2018
+  * with ``--pre_train download``, pretrained models will be automatically downloaded from server.
+  * Supports video input/output (inference only). Try with ``--data_test video --dir_demo [video file directory]``.
+
